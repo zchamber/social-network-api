@@ -1,12 +1,26 @@
+const mongoose = require('mongoose');
 const { User, Thought, Reaction } = require('../models'); // Import your Mongoose models
 
 // Predefined data
 const userNames = [
-  "John", "Sarah", "Michael", "Emily", "David", "Jessica", "Christopher", "Amanda", "Matthew", "Jennifer",
+  "John", "Sarah", "Michael", "David", "Jessica", "Christopher", "Amanda", "Matthew", "Jennifer",
   "Andrew", "Elizabeth", "James", "Lauren", "Joshua", "Samantha", "Robert", "Ashley", "William", "Brittany",
   "Daniel", "Megan", "Joseph", "Kayla", "Benjamin", "Nicole", "Ryan", "Victoria", "Nicholas", "Rachel",
   "Jacob", "Stephanie", "Tyler", "Christina", "Jonathan", "Emily", "Brandon", "Heather", "Zachary", "Tiffany",
-  "Justin", "Michelle", "Eric", "Amber", "Alexander", "Brittany", "Kevin", "Melissa", "Cody", "Katie"
+  "Justin", "Michelle", "Emily", "Eric", "Amber", "Alexander", "Kevin", "Melissa", "Cody", "Katie"
+];
+
+const userEmails = [
+  "john@example.com", "sarah@example.com", "michael@example.com", "david@example.com",
+  "jessica@example.com", "christopher@example.com", "amanda@example.com", "matthew@example.com", "jennifer@example.com",
+  "andrew@example.com", "elizabeth@example.com", "james@example.com", "lauren@example.com", "joshua@example.com",
+  "samantha@example.com", "robert@example.com", "ashley@example.com", "william@example.com", "brittany@example.com",
+  "daniel@example.com", "megan@example.com", "joseph@example.com", "kayla@example.com", "benjamin@example.com",
+  "nicole@example.com", "ryan@example.com", "victoria@example.com", "nicholas@example.com", "rachel@example.com",
+  "jacob@example.com", "stephanie@example.com", "tyler@example.com", "christina@example.com", "jonathan@example.com",
+  "emily@example.com", "brandon@example.com", "heather@example.com", "zachary@example.com", "tiffany@example.com",
+  "justin@example.com", "michelle@example.com", "emily@example.com", "eric@example.com", "amber@example.com", "alexander@example.com",
+   "kevin@example.com", "melissa@example.com", "cody@example.com", "katie@example.com"
 ];
 
 const thoughts = [
@@ -29,9 +43,17 @@ const reactions = [
 // Function to seed the database
 const seedDatabase = async () => {
   try {
+    // Connect to MongoDB
+    const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/social-network-api';
+    await mongoose.connect(MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+    console.log('Connected to MongoDB');
+
     // Insert users into the database
     await User.deleteMany(); // Clear existing users
-    const createdUsers = await User.insertMany(userNames.map(username => ({ username })));
+    const createdUsers = await User.insertMany(userNames.map((username, index) => ({ username, email: userEmails[index] })));
 
     // Insert thoughts into the database
     await Thought.deleteMany(); // Clear existing thoughts
@@ -44,6 +66,8 @@ const seedDatabase = async () => {
     console.log('Database seeded successfully!');
   } catch (error) {
     console.error('Error seeding database:', error);
+  } finally {
+    mongoose.disconnect();
   }
 };
 
