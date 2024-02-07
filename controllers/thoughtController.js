@@ -62,7 +62,53 @@ const thoughtController = {
     } catch (error) {
       res.status(400).json({ error: 'Failed to delete thought' });
     }
+  },
+
+  createReaction: async (req, res) => {
+    const { thoughtId } = req.params;
+    const { reactionBody, username } = req.body;
+    console.log (thoughtId)
+    try {
+      const updatedThought = await Thought.findOneAndUpdate(
+        { _id: thoughtId },
+        { $push: { reactions: req.body } },
+        { new: true }
+      );
+      
+      if (!updatedThought) {
+        return res.status(404).json({ message: 'Thought not found' });
+      }
+
+      return res.status(201).json(updatedThought);
+    } catch (error) {
+      console.error('Error creating reaction:', error);
+      return res.status(500).json({ message: 'Error creating reaction' });
+    }
+  },
+
+  deleteReaction: async (req, res) => {
+    const { thoughtId, reactionId } = req.params;
+
+    try {
+      const updatedThought = await Thought.findOneAndUpdate(
+        { _id: thoughtId },
+        { $pull: { reactions: { _id: reactionId } } },
+        { new: true }
+      );
+
+      if (!updatedThought) {
+        return res.status(404).json({ message: 'Thought not found' });
+      }
+
+      return res.status(200).json(updatedThought);
+    } catch (error) {
+      console.error('Error deleting reaction:', error);
+      return res.status(500).json({ message: 'Error deleting reaction' });
+    }
   }
+  
 };
+
+
 
 module.exports = thoughtController;
